@@ -33,6 +33,7 @@ import org.neuroml.export.brian.BrianWriter;
 import org.neuroml.export.dnsim.DNSimWriter;
 import org.neuroml.export.exceptions.GenerationException;
 import org.neuroml.export.exceptions.ModelFeatureSupportException;
+import org.neuroml.export.geppetto.GeppettoWriter;
 import org.neuroml.export.graph.GraphWriter;
 import org.neuroml.export.info.InfoWriter;
 import org.neuroml.export.nest.NestWriter;
@@ -104,6 +105,8 @@ public class JNeuroML
     public static final String SPINEML_EXPORT_FLAG = "-spineml";
 
     public static final String NEST_EXPORT_FLAG = "-nest";
+    
+    public static final String GEPPETTO_EXPORT_FLAG = "-geppetto";
 
     public static final String SBML_IMPORT_FLAG = "-sbml-import";
     public static final String SBML_IMPORT_UNITS_FLAG = "-sbml-import-units";
@@ -418,6 +421,26 @@ public class JNeuroML
                     for(File genFile : nw.convert())
                     {
                         System.out.println("Writing to: " + genFile.getAbsolutePath());
+                    }
+                }
+                else if(args[1].equals(GEPPETTO_EXPORT_FLAG))
+                {
+
+                    File lemsFile = (new File(args[0])).getAbsoluteFile();
+                    Lems lems = loadLemsFile(lemsFile);
+
+                    String suffix = ".geppetto";
+                    String gFileName = lemsFile.getName().replaceAll("." + Format.LEMS.getExtension(), suffix+"." + Format.GEPPETTO.getExtension());
+                    File gFile = new File(lemsFile.getParentFile(), gFileName);
+                    GeppettoWriter gw = new GeppettoWriter(lems, lemsFile.getParentFile(), gFileName, lemsFile);
+                    for(File genFile : gw.convert())
+                    {
+                        System.out.println("Writing to: " + genFile.getAbsolutePath());
+                        
+                        if (genFile.getName().indexOf("geppetto") > 0) {
+                            System.out.println("\nTry running this file locally with Geppetto using:\n\n    "
+                                + "http://localhost:8080/org.geppetto.frontend/?sim=file://" + genFile + "\n");
+                        }
                     }
                 }
                 else if(args[1].equals(SEDML_EXPORT_FLAG))
